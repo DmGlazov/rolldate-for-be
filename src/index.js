@@ -29,10 +29,12 @@ function Rolldate(config = {}){
   // 设置默认日期
   if(config.value){
     if(config.el){
+      var defDateArr= config.value.split(/-|\/|\s|:/g);
+      var defDateStr= `${defDateArr[0]}年${defDateArr[1]}月${defDateArr[2]}日`;
       if(el.nodeName.toLowerCase() == 'input'){
-        el.value = config.value;
+        el.value = defDateStr;
       }else{
-        el.innerText = config.value;
+        el.innerText = defDateStr;
       }
     }
     let str = config.value.replace(/-/g, '/').replace(/[^\d/:\s]/g, ''),
@@ -66,6 +68,7 @@ Rolldate.prototype = {
         format:'YYYY-MM-DD',
         beginYear:2000,
         endYear:2100,
+        displayYear: null,
         init:null,
         moveEnd:null,
         confirm:null,
@@ -111,7 +114,7 @@ Rolldate.prototype = {
 
       if(f == 'YYYY'){
         for(let j=config.beginYear; j<=config.endYear; j++){
-          itemClass = j == date.getFullYear()? 'active':'';
+          itemClass = (j == date.getFullYear()) || (j == config.displayYear)? 'active':'';
 
           ul += `<li class="wheel-item ${itemClass}" data-index="${domMndex}">${j}${lang.year}</li>`;
           domMndex ++;
@@ -184,7 +187,9 @@ Rolldate.prototype = {
       _this.scroll[FormatArr[i]] = new BScroll('#'+$id, {
         wheel: {
           selectedIndex: 0
-        }
+        },
+        mouseWheel: true,
+        click: true,
       });
 
       let that = _this.scroll[FormatArr[i]],
@@ -330,12 +335,14 @@ Rolldate.prototype = {
           date = flag;
         }
       }
+      var dateArr= date.split(/-|\/|\s|:/g);
+      var dateStr= `${dateArr[0]}年${dateArr[1]}月${dateArr[2]}日`;
       if(config.el){
         el = $(config.el);
         if(el.nodeName.toLowerCase() == 'input'){
-          el.value = date;
+          el.value = dateStr;
         }else{
-          el.innerText = date;
+          el.innerText = dateStr;
         }
         el.bindDate = newDate;
       }else{
